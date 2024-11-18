@@ -174,6 +174,21 @@ void BestMove(TileElement Map[3][3])
     Map[BestX][BestY] = TileElement_X;
 }
 
+bool Tie(TileElement Map[3][3])
+{
+    for (i32 X = 0; X < 3; X++)
+    {
+        for (i32 Y = 0; Y < 3; Y++)
+        {
+            if (Map[X][Y] == TileElement_Empty)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 i32 main(void)
 {
     TileElement Map[3][3];
@@ -198,14 +213,15 @@ i32 main(void)
         }
         else
         {
-            printf("AI is thinking...");
+            printf("AI is thinking...\n");
             BestMove(Map);
         }
         CurrentTurn = !CurrentTurn;
 
         bool P1Won = CheckWinCondition(Map, TileElement_O);
         bool P2Won = CheckWinCondition(Map, TileElement_X);
-        GameWon = P1Won || P2Won;
+        bool Tied = Tie(Map);
+        GameWon = P1Won || P2Won || Tie;
 
         if (P1Won)
         {
@@ -216,6 +232,11 @@ i32 main(void)
         {
             DisplayMap(Map);
             printf("Victory for X!\n");
+        }
+        else if (Tied)
+        {
+            DisplayMap(Map);
+            printf("Tie!");
         }
     }
 
