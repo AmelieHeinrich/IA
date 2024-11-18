@@ -1,9 +1,8 @@
-@echo off
-
 ::
 :: THIS BUILD SCRIPT IS PROVIDED BY AMELIE HEINRICH -- IF YOU HAVE ANY QUESTIONS, REFER TO THE FOLLOWING EMAIL ADDRESS: aheinrich@gaming.tech
 :: CE SCRIPT DE BUILD A ETE ECRIT PAR AMELIE HEINRICH -- SI VOUS AVEZ DES QUESTIONS, ENVOYEZ LES MOI A CETTE ADRESSE EMAIL: aheinrich@gaming.tech
 ::
+@echo off
 
 :: If the Visual Studio command line isn't initialized, call vcvarsall x64 to do so. Gives access to commands like cl, link, lib, devenv, MSBuild etc.
 WHERE cl
