@@ -221,7 +221,7 @@ i32 main(void)
         bool P1Won = CheckWinCondition(Map, TileElement_O);
         bool P2Won = CheckWinCondition(Map, TileElement_X);
         bool Tied = Tie(Map);
-        GameWon = P1Won || P2Won || Tie;
+        GameWon = P1Won || P2Won || Tied;
 
         if (P1Won)
         {
