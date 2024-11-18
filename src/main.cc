@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <climits>
+#include <utility>
 
 #include "common.h"
 
@@ -70,16 +72,10 @@ bool CheckWinCondition(TileElement Map[3][3], TileElement Element)
     }
 
     // @NOTE(amélie): Check for diagonals
+    if ((Map[0][0] == Element && Map[1][1] == Element && Map[2][2] == Element)
+     || (Map[0][2] == Element && Map[1][1] == Element && Map[2][0] == Element))
     {
-        i32 WinCounter = 0;
-        if (Map[0][0] == Element)
-            WinCounter++;
-        if (Map[1][1] == Element)
-            WinCounter++;
-        if (Map[2][2] == Element)
-            WinCounter++;
-        if (WinCounter == 3)
-            return true;
+         return true;
     }
 
     return false;
@@ -88,6 +84,94 @@ bool CheckWinCondition(TileElement Map[3][3], TileElement Element)
 bool IsValidPosition(i32 X, i32 Y, TileElement Map[3][3])
 {
     return (X >= 0 && X < 3 && Y >= 0 && Y < 3 && Map[X][Y] == TileElement_Empty);
+}
+
+i32 Minimax(TileElement Map[3][3], bool IsMaximizing, i32 Depth)
+{
+    if (CheckWinCondition(Map, TileElement_X))
+    {
+        return 10 - Depth;
+    }
+    if (CheckWinCondition(Map, TileElement_O))
+    {
+        return Depth - 10;
+    }
+    
+    bool IsFull = true;
+    for (i32 X = 0; X < 3; X++)
+    {
+        for (i32 Y = 0; Y < 3; Y++)
+        {
+            if (Map[X][Y] == TileElement_Empty)
+            {
+                IsFull = false;
+            }
+        }
+    }
+    if (IsFull)
+        return 0;  // Draw
+
+    if (IsMaximizing)
+    {
+        i32 Best = -INT_MAX;
+        for (i32 X = 0; X < 3; X++)
+        {
+            for (i32 Y = 0; Y < 3; Y++)
+            {
+                if (Map[X][Y] == TileElement_Empty)
+                {
+                    Map[X][Y] = TileElement_X;
+                    Best = std::max(Best, Minimax(Map, false, Depth + 1));
+                    Map[X][Y] = TileElement_Empty;
+                }
+            }
+        }
+        return Best;
+    }
+    else
+    {
+        i32 Best = INT_MAX;
+        for (i32 X = 0; X < 3; X++)
+        {
+            for (i32 Y = 0; Y < 3; Y++)
+            {
+                if (Map[X][Y] == TileElement_Empty)
+                {
+                    Map[X][Y] = TileElement_O;
+                    Best = std::min(Best, Minimax(Map, true, Depth + 1));
+                    Map[X][Y] = TileElement_Empty;
+                }
+            }
+        }
+        return Best;
+    }
+}
+
+void BestMove(TileElement Map[3][3])
+{
+    i32 BestVal = -INT_MAX;
+    i32 BestX = -1, BestY = -1;
+
+    for (i32 X = 0; X < 3; X++)
+    {
+        for (i32 Y = 0; Y < 3; Y++)
+        {
+            if (Map[X][Y] == TileElement_Empty)
+            {
+                Map[X][Y] = TileElement_X;
+                i32 MoveVal = Minimax(Map, false, 0);
+                Map[X][Y] = TileElement_Empty;
+                if (MoveVal > BestVal)
+                {
+                    BestX = X;
+                    BestY = Y;
+                    BestVal =MoveVal;
+                }
+            }
+        }
+    }
+
+    Map[BestX][BestY] = TileElement_X;
 }
 
 i32 main(void)
@@ -114,13 +198,8 @@ i32 main(void)
         }
         else
         {
-            i32 X = 4, Y = 4;
-            while (!IsValidPosition(X, Y, Map))
-            {
-                printf("Choose position for X (Format: X Y): ");
-                scanf("%d %d", &X, &Y);
-            }
-            Map[X][Y] = TileElement_X;
+            printf("AI is thinking...");
+            BestMove(Map);
         }
         CurrentTurn = !CurrentTurn;
 
